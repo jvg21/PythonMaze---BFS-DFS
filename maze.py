@@ -37,4 +37,48 @@ class QueueFrontier(StackFrontier):
 
 
 class Maze():
-    pass
+    def __init__(self,filename) :
+        with open(filename) as f:
+            file_content = f.read()
+
+        if file_content.count("A")!=1:
+            raise Exception("Maze must have one starting point") 
+        if file_content.count("B")!=1:
+            raise Exception("Maze must have one exit point")
+        
+        file_content = file_content.splitlines()
+        self.heigth = len(file_content)
+        self.width = max(len(line) for line in file_content)
+
+        self.walls = []
+        for i in range(self.heigth):
+            row = []
+            for j in range(self.width):
+                try:
+                    if file_content[i][j] == 'A':
+                        self.start = file_content[i][j]
+                        row.append(False)
+
+                    elif file_content[i][j] == 'B':
+                        self.goal = file_content[i][j]
+                        row.append(False)
+                    
+                    elif file_content[i][j] == ' ':
+                        row.append(False)
+                    
+                    else:
+                        row.append(True)
+
+                except IndexError:
+                    row.append(False)
+
+            self.walls.append(row)
+
+        self.solution = None
+    
+    def print():
+        pass
+
+    
+
+
