@@ -95,6 +95,26 @@ class Maze():
             print()
         print()
 
+    def neighbors(self,state):
+        row, col = state
+        candidates = [
+            ("up",(row - 1, col)),
+            ("down",(row + 1, col)),
+            ("right",(row, col + 1)),
+            ("left",(row, col - 1))
+        ]
+
+        result = []
+
+        for action,(r,c) in candidates:
+            try:
+                if not self.walls[r][c]:
+                    result.append((action,(r,c)))
+            except IndexError:
+                continue
+
+        return result
+
     
 
 
