@@ -49,11 +49,11 @@ class Maze():
             raise Exception("Maze must have one exit point")
         
         file_content = file_content.splitlines()
-        self.heigth = len(file_content)
+        self.height = len(file_content)
         self.width = max(len(line) for line in file_content)
 
         self.walls = []
-        for i in range(self.heigth):
+        for i in range(self.height):
             row = []
             for j in range(self.width):
                 try:
@@ -121,7 +121,7 @@ class Maze():
         self.num_explored = 0
 
         start = Node(state = self.start,parent=None,action=None)
-        frontier = StackFrontier()
+        frontier = QueueFrontier()
         frontier.add(start)
 
         self.explored = set()
@@ -156,12 +156,12 @@ class Maze():
                     child = Node(state = state, parent = node, action = action)
                     frontier.add(child)
 
-    def output_image(self,filename,show_solution=True,show_explored=False):
+    def output_image(self,filename,show_solution=True,show_explored=True):
         from PIL import Image,ImageDraw
         cell_size = 50
-        call_border = 2
+        cell_border = 2
 
-        img = Image.new("RGBA",(self.width*cell_size,self.heigth*cell_size),"black")
+        img = Image.new("RGBA",(self.width*cell_size,self.height*cell_size),"black")
         draw = ImageDraw.Draw(img)
 
         solution = self.solution[1] if self.solution is not None else None
@@ -173,10 +173,35 @@ class Maze():
                     fill = (255,0,0)
                 elif (i,j) == self.goal:
                     fill = (0,170,28)
-                elif solution is not None and(i,j) in solution:
+                elif solution is not None and show_solution and(i,j) in solution:
                     fill = (220,235,113)
+                    
+                elif solution is not None and show_explored and(i,j) in self.explored:
+                    fill = (100, 50, 113)
                 else:
                     fill = (237,240,252)
+                
+                draw.rectangle([(j*cell_size+cell_border,i*cell_size+cell_border),
+                                ((j+1)*cell_size - cell_border,(i+1)*cell_size - cell_border)],fill=fill)
+
+                self.draw_number(draw, j, i, cell_size,self.num_explored)
+                img.save(filename)
+
+
+    def draw_number(self, draw, x, y, cell_size,number):
+# Coordenadas do centro do quadrado
+        center_x = x * cell_size + cell_size // 2
+        center_y = y * cell_size + cell_size // 2
+
+        number = str(number)
+        # Tamanho e cor do texto
+        text_size = min(cell_size // 2, 20)
+        text_color = (255, 255, 255)
+
+        # Adiciona o texto ao centro do quadrado
+        draw.text((center_x - text_size // 2, center_y - text_size // 2), number,
+                font=None, fill=text_color)
+
 
 if len(sys.argv )!=2:
     sys.exit("Invalid arguments")
@@ -189,6 +214,7 @@ maze.solve()
 print("Number of states: ", maze.num_explored)
 print("Solution: ")
 maze.print()
+maze.output_image("output.png")
 
 
 
